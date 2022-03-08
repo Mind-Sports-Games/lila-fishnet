@@ -1,6 +1,6 @@
 package lila.fishnet
 
-import chess.format.{ FEN, Uci }
+import strategygames.format.{ FEN, Uci }
 import io.lettuce.core._
 import io.lettuce.core.pubsub._
 import org.joda.time.DateTime
@@ -49,8 +49,8 @@ object Lila {
       case Array(gameId, levelS, clockS, variantS, initialFenS, moves) =>
         for {
           level <- parseIntOption(levelS)
-          variant    = chess.variant.Variant.orDefault(variantS)
-          initialFen = if (initialFenS.isEmpty) None else Some(FEN(initialFenS))
+          variant    = strategygames.variant.Variant.orDefault(variantS)
+          initialFen = if (initialFenS.isEmpty) None else Some(FEN(variant, initialFenS))
           clock      = readClock(clockS)
         } yield Work.Move(
           _id = Work.makeId,

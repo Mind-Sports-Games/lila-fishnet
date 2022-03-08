@@ -2,8 +2,8 @@ package lila.fishnet
 
 import play.api.libs.json._
 
-import chess.format.{ FEN, Uci }
-import chess.variant.Variant
+import strategygames.format.{ FEN, Uci }
+import strategygames.variant.Variant
 import lila.fishnet.{ Work => W }
 
 object JsonApi {
@@ -23,8 +23,8 @@ object JsonApi {
 
     case class PostMove(fishnet: Fishnet, move: MoveResult) extends Request with Result
 
-    case class MoveResult(bestmove: String) {
-      def uci: Option[Uci] = Uci(bestmove)
+    case class MoveResult(variant: Variant, bestmove: String) {
+      def uci: Option[Uci] = Uci(variant, bestmove)
     }
   }
 
@@ -58,6 +58,7 @@ object JsonApi {
 
   object readers {
     implicit val ClientKeyReads  = Reads.of[String].map(new ClientKey(_))
+    implicit val VariantRead     = Reads.of[String].map(Variant.orDefault)
     implicit val FishnetReads    = Json.reads[Request.Fishnet]
     implicit val AcquireReads    = Json.reads[Request.Acquire]
     implicit val MoveResultReads = Json.reads[Request.MoveResult]
@@ -66,7 +67,7 @@ object JsonApi {
 
   object writers {
     implicit val VariantWrites                   = Writes[Variant] { v => JsString(v.key) }
-    implicit val FENWrites                       = Writes[FEN] { fen => JsString(fen.value) }
+    implicit val FENWrites                       = Writes[FEN] { fen => JsString(fen.toString) }
     implicit val GameWrites: Writes[Game]        = Json.writes[Game]
     implicit val ClockWrites: Writes[Work.Clock] = Json.writes[Work.Clock]
     implicit val WorkIdWrites                    = Writes[Work.Id] { id => JsString(id.value) }

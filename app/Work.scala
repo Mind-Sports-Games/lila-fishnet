@@ -1,8 +1,8 @@
 package lila.fishnet
 
 import org.joda.time.DateTime
-import chess.variant.Variant
-import chess.format.FEN
+import strategygames.variant.Variant
+import strategygames.format.FEN
 
 sealed trait Work {
   def _id: Work.Id
