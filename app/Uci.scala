@@ -13,9 +13,7 @@ trait Uci {
 
 object Uci {
 
-  println("Init!")
   init()
-  println(s"${availablePieceChars().getString()}!")
 
   def apply(s: String): Option[Uci] = {
     if (validUci(s)) Some(UciImpl(s))
@@ -51,13 +49,8 @@ object Uci {
     if (s.length() < 4 || s.length() > 7) false
     else if (s == "0000") true
     else {
-      println(s)
-      println(s(0))
-      println(s(1))
       val isDrop      = validRole(s(0)) && s(1) == '@'
       val isPromotion = validPromotableRole(s.last)
-      println(s"isDrop: ${isDrop}")
-      println(s"isPromotion: ${isPromotion}")
       (isDrop, isPromotion, s.length()) match {
         // Drops
         case (true, false, 4 | 5) => validRole(s(0)) && validSquare(s.slice(2, s.length())) // P@b4
