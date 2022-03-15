@@ -55,10 +55,16 @@ object Uci {
         // Drops
         case (true, false, 4 | 5) => validRole(s(0)) && validSquare(s.slice(2, s.length())) // P@b4
         // Promotions
+        // NOTE: d10d11 doesn't work yet because we don't have any games that support it
+        //       but I'm still using it in the examples here because this coe handles it.
+        //       It's the above validRank that does not.
         case (false, true, 5 | 6 | 7) =>
           validSquarePair(s.slice(0, s.length() - 1)) // d8d9+ | d8d9R | d10d11+
         // moves
-        case (false, false, 4 | 5 | 6) => validSquarePair(s.slice(0, s.length())) // d8d9 | d9d11 | d10d11
+        // NOTE: d10d11 doesn't work yet because we don't have any games that support it
+        //       but I'm still using it in the examples here because this coe handles it.
+        //       It's the above validRank that does not.
+        case (false, false, 4 | 5 | 6) => validSquarePair(s.slice(0, s.length())) // d8d9 | d9d10 | d10d11
 
         // Bleh
         case _ => false
