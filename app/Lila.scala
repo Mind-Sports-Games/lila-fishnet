@@ -1,11 +1,12 @@
 package lila.fishnet
 
-import strategygames.format.{ FEN, Uci }
+import strategygames.format.{ FEN }
 import io.lettuce.core._
 import io.lettuce.core.pubsub._
 import org.joda.time.DateTime
 import play.api.Configuration
 import play.api.Logger
+import lila.uci.Uci
 
 final class Lila(
     moveDb: MoveDb,
