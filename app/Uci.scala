@@ -20,7 +20,7 @@ object Uci {
     else None
   }
 
-  val availablePieces = availablePieceChars().getString()
+  val availablePieces           = availablePieceChars().getString()
   val availablePromotablePieces = availablePromotablePieceChars().getString()
 
   def validRole(c: Char): Boolean = availablePieces.exists(c.==)
@@ -28,7 +28,7 @@ object Uci {
     c == '+' || availablePromotablePieces.exists(c.==)
   def validFile(c: Char): Boolean = ('a' to 'i').exists(c.==)
   def validRank(s: String): Boolean =
-    (s.length() == 1 && ('0' to '9').exists(s(0).==)) || (s.length() == 2 && s == "10")
+    (s.length() == 1 && ('0' to '9').exists(s(0).==)) || (s == "10")
   def validSquare(s: String): Boolean =
     (s.nonEmpty && validFile(s(0))) &&
       ((s.length() == 2 && validRank(s.slice(1, 2))) ||
@@ -45,20 +45,22 @@ object Uci {
       case _ => false
     }
 
-  def validUci(s: String): Boolean =
-    if (s.length() < 4 || s.length() > 7) false
-    else if (s == "0000") true
+  def validUci(uci: String): Boolean =
+    if (uci.length() < 4 || uci.length() > 7) false
+    else if (uci == "0000") true
     else {
-      val isDrop      = validRole(s(0)) && s(1) == '@'
-      val isPromotion = validPromotableRole(s.last)
-      (isDrop, isPromotion, s.length()) match {
+      val uciLower    = uci.toLowerCase()
+      val isDrop      = validRole(uciLower(0)) && uciLower(1) == '@'
+      val isPromotion = validPromotableRole(uciLower.last)
+      (isDrop, isPromotion, uciLower.length()) match {
         // Drops
-        case (true, false, 4 | 5) => validRole(s(0)) && validSquare(s.slice(2, s.length())) // P@b4
+        case (true, false, 4) =>
+          validRole(uciLower(0)) && validSquare(uciLower.slice(2, uciLower.length())) // P@b4
         // Promotions
-        case (false, true, 5 | 6 | 7) =>
-          validSquarePair(s.slice(0, s.length() - 1)) // d8d9+ | d8d9R | d10e10+
+        case (false, true, 5 | 6) =>
+          validSquarePair(uciLower.slice(0, uciLower.length() - 1)) // d8d9+ | d8d9R | d8e9+
         // moves
-        case (false, false, 4 | 5 | 6) => validSquarePair(s.slice(0, s.length())) // d8d9 | d9d10 | d10d10
+        case (false, false, 4 | 5) => validSquarePair(uciLower) // d8d9 | d9d10
 
         // Bleh
         case _ => false
