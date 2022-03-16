@@ -1,12 +1,11 @@
 package lila.fishnet
 
-import strategygames.format.{ FEN }
+import strategygames.format.{ FEN, LexicalUci }
 import io.lettuce.core._
 import io.lettuce.core.pubsub._
 import org.joda.time.DateTime
 import play.api.Configuration
 import play.api.Logger
-import lila.uci.Uci
 
 final class Lila(
     moveDb: MoveDb,
@@ -41,7 +40,7 @@ object Lila {
 
   import Util.parseIntOption
 
-  case class Move(gameId: String, ply: Int, uci: Uci) {
+  case class Move(gameId: String, ply: Int, uci: LexicalUci) {
     def write = s"$gameId $ply ${uci.uci}"
   }
 

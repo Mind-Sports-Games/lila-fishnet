@@ -2,10 +2,9 @@ package lila.fishnet
 
 import play.api.libs.json._
 
-import strategygames.format.FEN
+import strategygames.format.{ FEN, LexicalUci }
 import strategygames.variant.Variant
 import lila.fishnet.{ Work => W }
-import lila.uci.Uci
 
 object JsonApi {
 
@@ -25,7 +24,7 @@ object JsonApi {
     case class PostMove(fishnet: Fishnet, move: MoveResult) extends Request with Result
 
     case class MoveResult(bestmove: String) {
-      def uci: Option[Uci] = Uci(bestmove)
+      def uci: Option[LexicalUci] = LexicalUci(bestmove)
     }
   }
 
