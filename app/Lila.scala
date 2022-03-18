@@ -40,8 +40,8 @@ object Lila {
 
   import Util.parseIntOption
 
-  case class Move(gameId: String, ply: Int, uci: LexicalUci) {
-    def write = s"$gameId $ply ${uci.uci}"
+  case class Move(familyId: Int, gameId: String, ply: Int, uci: LexicalUci) {
+    def write = s"$familyId $gameId $ply ${uci.uci}"
   }
 
   def readMoveReq(msg: String): Option[Work.Move] =
