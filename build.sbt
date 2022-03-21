@@ -20,9 +20,13 @@ libraryDependencies += "org.playstrategy" %% "strategygames"                % "1
 libraryDependencies += "io.kamon"         %% "kamon-core"                   % kamonVersion
 libraryDependencies += "io.kamon"         %% "kamon-influxdb"               % kamonVersion
 libraryDependencies += "io.kamon"         %% "kamon-system-metrics"         % kamonVersion
+libraryDependencies += "org.playstrategy"  % "fairystockfish"               % "0.0.7"
 
 resolvers += "lila-maven" at "https://raw.githubusercontent.com/Mind-Sports-Games/lila-maven/master"
 
+// Explicitly add in the linux-class path
+lazy val fairystockfish = Artifact("fairystockfish", "linux-x86_64")
+libraryDependencies += "org.playstrategy"        % "fairystockfish"           % "0.0.7" artifacts(fairystockfish)
 
 scalacOptions ++= Seq(
   "-explaintypes",
