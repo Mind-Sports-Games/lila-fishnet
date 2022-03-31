@@ -84,7 +84,7 @@ final class MoveDb(implicit system: ActorSystem, ec: ExecutionContext) {
               case _ =>
                 sender() ! None
                 updateOrGiveUp(move.invalid)
-                monitor.failure(move, data.clientKey, new Exception("Missing move"))
+                monitor.failure(move, data.clientKey, new Exception(s"Missing or invalid move. bestmove string: [${data.move.bestmove}]"))
             }
           case Some(move) =>
             sender() ! None
