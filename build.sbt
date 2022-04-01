@@ -9,9 +9,10 @@ lazy val root = Project("lila-fishnet", file("."))
   .disablePlugins(PlayAkkaHttpServer)
 
 scalaVersion := "2.13.5"
-resourceDirectory in Compile := baseDirectory.value / "conf"
 
 val kamonVersion = "2.1.16"
+
+val fairystockfishVersion = "0.0.7"
 
 libraryDependencies += "io.lettuce"        % "lettuce-core"                 % "6.1.1.RELEASE"
 libraryDependencies += "io.netty"          % "netty-transport-native-epoll" % "4.1.63.Final" classifier "linux-x86_64"
@@ -20,13 +21,13 @@ libraryDependencies += "org.playstrategy" %% "strategygames"                % "1
 libraryDependencies += "io.kamon"         %% "kamon-core"                   % kamonVersion
 libraryDependencies += "io.kamon"         %% "kamon-influxdb"               % kamonVersion
 libraryDependencies += "io.kamon"         %% "kamon-system-metrics"         % kamonVersion
-libraryDependencies += "org.playstrategy"  % "fairystockfish"               % "0.0.7"
+libraryDependencies += "org.playstrategy"  % "fairystockfish"               % fairystockfishVersion
 
 resolvers += "lila-maven" at "https://raw.githubusercontent.com/Mind-Sports-Games/lila-maven/master"
 
 // Explicitly add in the linux-class path
 lazy val fairystockfish = Artifact("fairystockfish", "linux-x86_64")
-libraryDependencies += "org.playstrategy"        % "fairystockfish"           % "0.0.7" artifacts(fairystockfish)
+libraryDependencies += "org.playstrategy" % "fairystockfish" % fairystockfishVersion artifacts(fairystockfish)
 
 scalacOptions ++= Seq(
   "-explaintypes",
