@@ -35,16 +35,19 @@ final class MoveDb(implicit system: ActorSystem, ec: ExecutionContext) {
     actor ? PostResult(workId, data) mapTo manifest[Option[Lila.Move]]
   }
 
-
   private def moves(movesString: String): List[String] =
     movesString.split(" ") match {
       case Array("") => Nil
-      case l => l.toList
+      case l         => l.toList
     }
 
   private def fairyUciToLilaUci(game: Work.Game, uci: LexicalUci) =
     game.variant match {
-      case Variant.FairySF(v) => Api.fairyUciToLilaUci(v, Some(moves(game.moves) ++ List(uci.uci))).fold(uci)(l => LexicalUci(l.last).getOrElse(uci))
+      case Variant.FairySF(v) =>
+        Api
+          .fairyUciToLilaUci(v, Some(moves(game.moves) ++ List(uci.uci)))
+          .flatMap(l => LexicalUci(l.last))
+          .getOrElse(uci)
       case _ => uci
     }
 
