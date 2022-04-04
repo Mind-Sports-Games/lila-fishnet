@@ -8,6 +8,9 @@ import org.joda.time.DateTime
 import play.api.Logger
 import scala.concurrent.duration._
 import scala.concurrent.{ ExecutionContext, Future }
+import strategygames.fairysf.Api
+import strategygames.variant.Variant
+import strategygames.format.LexicalUci
 
 final class MoveDb(implicit system: ActorSystem, ec: ExecutionContext) {
 
@@ -31,6 +34,19 @@ final class MoveDb(implicit system: ActorSystem, ec: ExecutionContext) {
   ): Future[Option[Lila.Move]] = {
     actor ? PostResult(workId, data) mapTo manifest[Option[Lila.Move]]
   }
+
+
+  private def moves(movesString: String): List[String] =
+    movesString.split(" ") match {
+      case Array("") => Nil
+      case l => l.toList
+    }
+
+  private def fairyUciToLilaUci(game: Work.Game, uci: LexicalUci) =
+    game.variant match {
+      case Variant.FairySF(v) => Api.fairyUciToLilaUci(v, Some(moves(game.moves) ++ List(uci.uci))).fold(uci)(l => LexicalUci(l.last).getOrElse(uci))
+      case _ => uci
+    }
 
   private val actor = system.actorOf(Props(new Actor {
 
@@ -76,7 +92,7 @@ final class MoveDb(implicit system: ActorSystem, ec: ExecutionContext) {
                     move.game.variant.gameFamily.id,
                     move.game.id,
                     move.game.ply,
-                    uci
+                    fairyUciToLilaUci(move.game, uci)
                   )
                 )
                 coll -= move.id
@@ -84,7 +100,11 @@ final class MoveDb(implicit system: ActorSystem, ec: ExecutionContext) {
               case _ =>
                 sender() ! None
                 updateOrGiveUp(move.invalid)
-                monitor.failure(move, data.clientKey, new Exception(s"Missing or invalid move. bestmove string: [${data.move.bestmove}]"))
+                monitor.failure(
+                  move,
+                  data.clientKey,
+                  new Exception(s"Missing or invalid move. bestmove string: [${data.move.bestmove}]")
+                )
             }
           case Some(move) =>
             sender() ! None
