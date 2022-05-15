@@ -66,7 +66,13 @@ object JsonApi {
   }
 
   object writers {
-    implicit val VariantWrites                   = Writes[Variant] { v => JsString(v.key) }
+    implicit val VariantWrites = Writes[Variant] { v =>
+      v.key match {
+        case "fiveCheck"  => JsString("5check")
+        case "noCastling" => JsString("nocastle")
+        case key          => JsString(key)
+      }
+    }
     implicit val FENWrites                       = Writes[FEN] { fen => JsString(fen.toString) }
     implicit val GameWrites: Writes[Game]        = Json.writes[Game]
     implicit val ClockWrites: Writes[Work.Clock] = Json.writes[Work.Clock]
