@@ -17,7 +17,7 @@ val fairystockfishVersion = "0.0.7"
 libraryDependencies += "io.lettuce"        % "lettuce-core"                 % "6.1.1.RELEASE"
 libraryDependencies += "io.netty"          % "netty-transport-native-epoll" % "4.1.63.Final" classifier "linux-x86_64"
 libraryDependencies += "joda-time"         % "joda-time"                    % "2.10.10"
-libraryDependencies += "org.playstrategy" %% "strategygames"                % "10.2.1-pstrat39"
+libraryDependencies += "org.playstrategy" %% "strategygames"                % "10.2.1-pstrat48"
 libraryDependencies += "io.kamon"         %% "kamon-core"                   % kamonVersion
 libraryDependencies += "io.kamon"         %% "kamon-influxdb"               % kamonVersion
 libraryDependencies += "io.kamon"         %% "kamon-system-metrics"         % kamonVersion
@@ -27,7 +27,7 @@ resolvers += "lila-maven" at "https://raw.githubusercontent.com/Mind-Sports-Game
 
 // Explicitly add in the linux-class path
 lazy val fairystockfish = Artifact("fairystockfish", "linux-x86_64")
-libraryDependencies += "org.playstrategy" % "fairystockfish" % fairystockfishVersion artifacts(fairystockfish)
+libraryDependencies += "org.playstrategy" % "fairystockfish" % fairystockfishVersion artifactsfairystockfish
 
 scalacOptions ++= Seq(
   "-explaintypes",
