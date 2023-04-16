@@ -116,15 +116,13 @@ final class MoveDb(implicit system: ActorSystem, ec: ExecutionContext) {
             data.move.uci match {
               case Some(uci) =>
                 sender() ! fairyUciToLilaUci(move.game, uci).zipWithIndex.map {
-                  case (subUci, i) => {
-                    println(s"Sending ${subUci} with move ${move.game.ply + i}")
+                  case (subUci, i) =>
                     Lila.Move(
                       move.game.variant.gameFamily.id,
                       move.game.id,
                       move.game.ply + i,
                       subUci
                     )
-                  }
                 }
                 coll -= move.id
                 monitor.success(move)
