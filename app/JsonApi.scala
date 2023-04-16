@@ -74,15 +74,7 @@ object JsonApi {
         "game_id"  -> g.game_id,
         "position" -> FEN.fishnetFen(g.variant)(g.position),
         "variant"  -> g.variant,
-        "moves" -> (if (g.moves == "") ""
-                    else
-                      UciDump.fishnetUci(
-                        g.variant,
-                        g.moves
-                          .split(" ")
-                          .flatMap(move => Uci(g.variant.gameLogic, g.variant.gameFamily, move))
-                          .toList
-                      ))
+        "moves"    -> UciDump.fishnetUci(g.variant, g.moves)
       )
     }
     implicit val ClockWrites: Writes[Work.Clock] = Json.writes[Work.Clock]
