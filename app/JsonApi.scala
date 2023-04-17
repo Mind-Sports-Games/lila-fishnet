@@ -2,7 +2,7 @@ package lila.fishnet
 
 import play.api.libs.json._
 
-import strategygames.format.{ FEN, LexicalUci }
+import strategygames.format.{ FEN, LexicalUci, Uci, UciDump }
 import strategygames.variant.Variant
 import lila.fishnet.{ Work => W }
 
@@ -65,10 +65,18 @@ object JsonApi {
     implicit val PostMoveReads   = Json.reads[Request.PostMove]
   }
 
+  // "position" -> FEN.fishnetFen(g.variant)(g.position),
   object writers {
     implicit val VariantWrites = Writes[Variant] { v => JsString(v.fishnetKey) }
-    implicit val FENWrites                       = Writes[FEN] { fen => JsString(fen.toString) }
-    implicit val GameWrites: Writes[Game]        = Json.writes[Game]
+    implicit val FENWrites     = Writes[FEN] { fen => JsString(fen.toString) }
+    implicit val GameWrites: Writes[Game] = Writes[Game] { g =>
+      Json.obj(
+        "game_id"  -> g.game_id,
+        "position" -> FEN.fishnetFen(g.variant)(g.position),
+        "variant"  -> g.variant,
+        "moves"    -> UciDump.fishnetUci(g.variant, g.moves)
+      )
+    }
     implicit val ClockWrites: Writes[Work.Clock] = Json.writes[Work.Clock]
     implicit val WorkIdWrites                    = Writes[Work.Id] { id => JsString(id.value) }
     implicit val WorkWrites = OWrites[Work] { work =>

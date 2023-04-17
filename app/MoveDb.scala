@@ -10,7 +10,9 @@ import scala.concurrent.duration._
 import scala.concurrent.{ ExecutionContext, Future }
 import strategygames.fairysf.Api
 import strategygames.variant.Variant
-import strategygames.format.LexicalUci
+import strategygames.fairysf.variant.Amazons
+import strategygames.format.{ LexicalUci, UciDump }
+import strategygames.fairysf.format.Uci
 
 final class MoveDb(implicit system: ActorSystem, ec: ExecutionContext) {
 
@@ -31,8 +33,8 @@ final class MoveDb(implicit system: ActorSystem, ec: ExecutionContext) {
   def postResult(
       workId: Work.Id,
       data: JsonApi.Request.PostMove
-  ): Future[Option[Lila.Move]] = {
-    actor ? PostResult(workId, data) mapTo manifest[Option[Lila.Move]]
+  ): Future[List[Lila.Move]] = {
+    actor ? PostResult(workId, data) mapTo manifest[List[Lila.Move]]
   }
 
   private def moves(movesString: String): List[String] =
@@ -41,14 +43,37 @@ final class MoveDb(implicit system: ActorSystem, ec: ExecutionContext) {
       case l         => l.toList
     }
 
-  private def fairyUciToLilaUci(game: Work.Game, uci: LexicalUci) =
+  // TODO: This should probably be moved into strategy games.
+  //       also, this is a bit heavy handed, it's only needed for some games. Shogi/minishogi for sure
+  //       maybe for xiangqi?
+  private def playOutGameToDeterminePromotionInFairyGames(game: Work.Game, uci: LexicalUci): LexicalUci =
     game.variant match {
       case Variant.FairySF(v) =>
         Api
-          .fairyUciToLilaUci(v, Some(moves(game.moves) ++ List(uci.uci)))
+          .fairyUciToLilaUci(
+            v,
+            Some(
+              moves(
+                UciDump
+                  .fishnetUci(game.variant, s"${game.moves} ${uci.uci}")
+              )
+            )
+          )
           .flatMap(l => LexicalUci(l.last))
           .getOrElse(uci)
       case _ => uci
+    }
+
+  private def fairyUciToLilaUci(game: Work.Game, uci: LexicalUci): List[LexicalUci] =
+    game.variant match {
+      case Variant.FairySF(v) =>
+        v match {
+          case Amazons =>
+            UciDump.fromFishnetUci(game.variant, List(uci))
+          case _ =>
+            List(playOutGameToDeterminePromotionInFairyGames(game, uci))
+        }
+      case _ => List(uci)
     }
 
   private val actor = system.actorOf(Props(new Actor {
@@ -90,14 +115,15 @@ final class MoveDb(implicit system: ActorSystem, ec: ExecutionContext) {
           case Some(move) if move isAcquiredBy data.clientKey =>
             data.move.uci match {
               case Some(uci) =>
-                sender() ! Some(
-                  Lila.Move(
-                    move.game.variant.gameFamily.id,
-                    move.game.id,
-                    move.game.ply,
-                    fairyUciToLilaUci(move.game, uci)
-                  )
-                )
+                sender() ! fairyUciToLilaUci(move.game, uci).zipWithIndex.map {
+                  case (subUci, i) =>
+                    Lila.Move(
+                      move.game.variant.gameFamily.id,
+                      move.game.id,
+                      move.game.ply + i,
+                      subUci
+                    )
+                }
                 coll -= move.id
                 monitor.success(move)
               case _ =>
