@@ -2,6 +2,7 @@ package lila.fishnet
 
 import org.joda.time.DateTime
 import strategygames.variant.Variant
+import strategygames.fairysf.variant.Amazons
 import strategygames.format.FEN
 
 sealed trait Work {
@@ -44,7 +45,14 @@ object Work {
       variant: Variant,
       moves: String
   ) {
-    def ply = if (moves.isEmpty) 0 else moves.count(' '.==) + 1
+    def ply =
+      if (moves.isEmpty) 0
+      else
+        (moves.count(' '.==) + 1) *
+          (variant match {
+            case Variant.FairySF(Amazons) => 2 // Amazons moves count double due to the way it's formatted.
+            case _                        => 1
+          })
   }
 
   case class Clock(wtime: Int, btime: Int, inc: Int)
