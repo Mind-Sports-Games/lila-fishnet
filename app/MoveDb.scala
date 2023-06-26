@@ -52,7 +52,7 @@ final class MoveDb(implicit system: ActorSystem, ec: ExecutionContext) {
         Api
           .fairyUciToLilaUci(
             v,
-            Some(moves(s"${game.moves} ${uci.uci}"))
+            Some(moves(s"${game.moves} ${uci.uci}".trim))
           )
           .flatMap(l => LexicalUci(l.last))
           .getOrElse(uci)
