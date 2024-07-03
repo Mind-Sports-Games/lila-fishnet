@@ -12,12 +12,12 @@ scalaVersion := "2.13.5"
 
 val kamonVersion = "2.1.16"
 
-val fairystockfishVersion = "0.0.18"
+val fairystockfishVersion = "0.0.20"
 
 libraryDependencies += "io.lettuce"        % "lettuce-core"                 % "6.1.1.RELEASE"
 libraryDependencies += "io.netty"          % "netty-transport-native-epoll" % "4.1.63.Final" classifier "linux-x86_64"
 libraryDependencies += "joda-time"         % "joda-time"                    % "2.10.10"
-libraryDependencies += "org.playstrategy" %% "strategygames"                % "10.2.1-pstrat108"
+libraryDependencies += "org.playstrategy" %% "strategygames"                % "10.2.1-pstrat148"
 libraryDependencies += "io.kamon"         %% "kamon-core"                   % kamonVersion
 libraryDependencies += "io.kamon"         %% "kamon-influxdb"               % kamonVersion
 libraryDependencies += "io.kamon"         %% "kamon-system-metrics"         % kamonVersion
